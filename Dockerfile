@@ -49,21 +49,10 @@ ENV PYTHONPATH=/app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Set the working directory and user
-WORKDIR /app
-USER app
-
 # Create log directory with correct permissions
 RUN mkdir -p /tmp/logs && \
     chown -R app:app /tmp/logs && \
     chmod -R 755 /tmp/logs
-
-# Expose the port the app runs on
-EXPOSE 8000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
 
 # Create a startup script
 RUN echo '#!/bin/sh\n\
@@ -74,8 +63,20 @@ uvicorn main:app --host 0.0.0.0 --port 8000 &\
 python -c "from main import bot, Config; import asyncio; asyncio.run(bot.start(Config.DISCORD_TOKEN))"\
 \
 # Keep the container running\
-wait\n' > /app/startup.sh && \
-    chmod +x /app/startup.sh
+wait\n' > /startup.sh && \
+    chmod +x /startup.sh && \
+    chown app:app /startup.sh
+
+# Set the working directory and user
+WORKDIR /app
+USER app
+
+# Expose the port the app runs on
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
 
 # Command to run the application
-CMD ["/app/startup.sh"]
+CMD ["/startup.sh"]
