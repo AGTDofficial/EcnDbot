@@ -19,12 +19,20 @@ from contextlib import asynccontextmanager
 load_dotenv()
 
 # Logging setup
+import os
+
+# Create logs directory if it doesn't exist
+log_dir = '/tmp/logs'
+os.makedirs(log_dir, exist_ok=True)
+log_file = os.path.join(log_dir, 'bot.log')
+
+# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler('bot.log', encoding='utf-8')
+        logging.FileHandler(log_file, encoding='utf-8')
     ]
 )
 logger = logging.getLogger(__name__)

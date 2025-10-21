@@ -36,8 +36,13 @@ COPY --from=builder /app/requirements.txt .
 RUN pip install --no-cache /wheels/* \
     && rm -rf /wheels
 
+# Create necessary directories and set permissions
+RUN mkdir -p /tmp/logs && \
+    chown -R app:app /tmp/logs && \
+    chmod -R 755 /tmp/logs
+
 # Copy application code
-COPY . .
+COPY --chown=app:app . .
 
 # Set environment variables
 ENV PYTHONPATH=/app
@@ -47,6 +52,11 @@ ENV PYTHONUNBUFFERED=1
 # Set the working directory and user
 WORKDIR /app
 USER app
+
+# Create log directory with correct permissions
+RUN mkdir -p /tmp/logs && \
+    chown -R app:app /tmp/logs && \
+    chmod -R 755 /tmp/logs
 
 # Expose the port the app runs on
 EXPOSE 8000
