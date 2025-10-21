@@ -65,5 +65,17 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
+# Create a startup script
+RUN echo '#!/bin/sh\n\
+# Start FastAPI server in the background\
+uvicorn main:app --host 0.0.0.0 --port 8000 &\
+\
+# Start the Discord bot\
+python -c "from main import bot, Config; import asyncio; asyncio.run(bot.start(Config.DISCORD_TOKEN))"\
+\
+# Keep the container running\
+wait\n' > /app/startup.sh && \
+    chmod +x /app/startup.sh
+
 # Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["/app/startup.sh"]
