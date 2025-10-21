@@ -57,11 +57,11 @@ RUN mkdir -p /tmp/logs && \
 # Create a startup script
 RUN echo '#!/bin/sh\n\
 # Start FastAPI server in the background\
-uvicorn main:app --host 0.0.0.0 --port 8000 &\
-\
+uvicorn main:app --host 0.0.0.0 --port 8000 &\n\
+\n\
 # Start the Discord bot\
-python -c "from main import bot, Config; import asyncio; asyncio.run(bot.start(Config.DISCORD_TOKEN))"\
-\
+python -c "from main import bot, Config; import asyncio; asyncio.run(bot.start(Config.DISCORD_TOKEN))"\n\
+\n\
 # Keep the container running\
 wait\n' > /startup.sh && \
     chmod +x /startup.sh && \
